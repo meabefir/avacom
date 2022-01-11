@@ -16,7 +16,11 @@ namespace asp_auth.Models.Entities
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public ICollection<UserRole> UserRoles { get; set; }
+
+        [InverseProperty("User")]
         public Avatar Avatar { get; set; }
+
+        [InverseProperty("User")]
         public UserProfile UserProfile { get; set; }
 
         [InverseProperty("User1")]
@@ -25,7 +29,17 @@ namespace asp_auth.Models.Entities
         [InverseProperty("User2")]
         public ICollection<Friend> FriendsImWith { get; set; }
 
+        [InverseProperty("Sender")]
+        public ICollection<FriendRequest> FRReceivedFrom { get; set; }
+        
+        [InverseProperty("Receiver")]
+        public ICollection<FriendRequest> FRSentTo { get; set; }
+
+        [InverseProperty("User")]
         public ICollection<Post> Posts { get; set; }
+
+        [InverseProperty("User")]
+        public ICollection<Comment> Comments { get; set; }
 
         [InverseProperty("User")]
         public ICollection<PostReaction> PostReactions { get; set; }

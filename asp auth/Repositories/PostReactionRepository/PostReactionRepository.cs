@@ -16,9 +16,9 @@ namespace asp_auth.Repositories
 
         }
 
-        public async Task<List<PostReaction>> GetPostReactionsByPostId(int post_id)
+        public async Task<List<PostReaction>> GetPostReactionsByPostId(int postId)
         {
-            return await _context.PostReactions.Where(pr => pr.PostId.Equals(post_id)).ToListAsync();
+            return await _context.PostReactions.Where(pr => pr.PostId.Equals(postId)).ToListAsync();
         }
     }
 }

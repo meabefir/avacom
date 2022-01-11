@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace asp_auth.Models.DTOs
 {
-    public class LoginUserDTO
+    public class FriendRequestDTO
     {
-        public string Username { get; set; }
-        public string Password { get; set; }
+        public int SenderId { get; set; }
+        public int ReceiverId { get; set; }
     }
 }

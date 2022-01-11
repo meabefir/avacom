@@ -14,9 +14,13 @@ namespace asp_auth.Models.Entities
         public string Text { get; set; }
         public DateTime CreatedAt { get; set; }
 
+        [ForeignKey("UserId")]
         public User User { get; set; }
+
         [InverseProperty("Post")]
         public ICollection<PostReaction> PostReactions { set; get; }
+
+        [InverseProperty("Post")]
         public ICollection<Comment> Comments { set; get; }
     }
 }

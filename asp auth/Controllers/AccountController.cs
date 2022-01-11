@@ -32,20 +32,26 @@ namespace asp_auth.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterUserDTO dto)
         {
-            var exists = await _userManager.FindByEmailAsync(dto.Email);
+            var exists = await _userManager.FindByNameAsync(dto.Username);
             
             if (exists != null)
             {
-                return BadRequest("User already registered");
+                return BadRequest(new { message = "Username not available." });
             }
 
             var result = await _userService.RegisterUserAsync(dto);
-            if (result)
+            if (result == "true")
             {
-                return Ok(result);
+                return Ok(new { message = "User registered successfuly." });
             }
-
-            return BadRequest();
+            else if (result == "false")
+            {
+                return BadRequest(new { message = "Unknown error." });
+            }
+            else
+            {
+                return BadRequest(new { message = result });
+            }
         }
 
         [HttpPost("login")]
@@ -54,12 +60,18 @@ namespace asp_auth.Controllers
         {
             var token = await _userService.LoginUser(dto);
 
-            if (token == null)
+            if (token.Equals("Wrong password."))
             {
-                return Unauthorized();
+                return Unauthorized(new { message = token });
             }
-
-            return Ok(new { token });
+            else if (token.Equals("User doesnt exist."))
+            {
+                return Unauthorized(new { message = token });
+            }
+            else
+            {
+                return Ok(new { token });
+            }
         }
     }
 }

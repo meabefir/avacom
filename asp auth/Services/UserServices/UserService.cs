@@ -25,13 +25,11 @@ namespace asp_auth.Services.UserServices
             _repository = repository;
         }
 
-        public async Task<bool> RegisterUserAsync(RegisterUserDTO dto)
+        public async Task<string> RegisterUserAsync(RegisterUserDTO dto)
         {
             var registerUser = new User();
             registerUser.Email = dto.Email;
-            registerUser.FirstName = dto.FirstName;
-            registerUser.LastName = dto.LastName;
-            registerUser.UserName = dto.Email;
+            registerUser.UserName = dto.Username;
 
             var result = await _userManager.CreateAsync(registerUser, dto.Password);
 
@@ -39,22 +37,26 @@ namespace asp_auth.Services.UserServices
             {
                 await _userManager.AddToRoleAsync(registerUser, UserRoleType.User);
 
-                return true;
+                return "true";
             }
-            return false;
+            else if (result.Errors.Count() > 0)
+            {
+                var err = result.Errors.First();
+                return err.Description;
+            }
+            return "false";
         }
 
         public async Task<string> LoginUser(LoginUserDTO dto)
         {
-            User user = await _userManager.FindByEmailAsync(dto.Email);
+            User user = await _userManager.FindByNameAsync(dto.Username);
             
-
             if (user != null)
             {
                 var passwordMatch = await _userManager.CheckPasswordAsync(user, dto.Password);
                 if (passwordMatch == false)
                 {
-                    return "wrong password";
+                    return "Wrong password.";
                 }
 
                 user = await _repository.User.GetByIdWithRoles(user.Id);
@@ -75,7 +77,7 @@ namespace asp_auth.Services.UserServices
                 return tokenHandler.WriteToken(token);
             }
 
-            return "user doesnt exist";
+            return "User doesnt exist.";
         }
 
         private SecurityToken GenerateJwtToken(SymmetricSecurityKey signinKey, User user, List<string> roles, JwtSecurityTokenHandler tokenHandler, string jti)
@@ -84,7 +86,8 @@ namespace asp_auth.Services.UserServices
                     new Claim(ClaimTypes.Email, user.Email),
                     //new Claim(ClaimTypes.Name, user.UserName),
                     new Claim(ClaimTypes.Name, user.Id.ToString()),
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.NameIdentifier, user.UserName),
+                    //new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(JwtRegisteredClaimNames.Jti, jti)
                 });
 

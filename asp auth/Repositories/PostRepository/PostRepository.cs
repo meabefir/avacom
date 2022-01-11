@@ -16,13 +16,9 @@ namespace asp_auth.Repositories
 
         }
 
-        public async Task<List<Post>> GetPostsByUserId(int UserId)
+        public async Task<List<Post>> GetPostsByUserId(int userId)
         {
-            return await _context.Posts.Where(p => p.UserId.Equals(UserId)).ToListAsync();
-            // return await _context.Posts
-            //    .Where(p => p.UserId.Equals(UserId);
-
-            //.FirstOrDefaultAsync(p => p.UserId.Equals(UserId));
+            return await _context.Posts.Where(p => p.UserId.Equals(userId)).ToListAsync();
         }
     }
 }

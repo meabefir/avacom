@@ -10,6 +10,7 @@ namespace asp_auth.Repositories
         IUserRepository User { get; }
         IPostRepository Post { get; }
         IPostReactionRepository PostReaction { get; }
+        IFRRepository FriendRequest { get; }
         ISessionTokenRepository SessionToken { get; }
         Task SaveAsync();
     }

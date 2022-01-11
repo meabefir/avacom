@@ -12,6 +12,7 @@ namespace asp_auth.Repositories
         private readonly AppDbContext _context;
         private IUserRepository _user;
         private IPostRepository _post;
+        private IFRRepository _friend_request;
         private IPostReactionRepository _post_reaction;
         private ISessionTokenRepository _sessionToken;
 
@@ -44,6 +45,15 @@ namespace asp_auth.Repositories
             {
                 if (_post_reaction == null) _post_reaction = new PostReactionRepository(_context);
                 return _post_reaction;
+            }
+        }
+
+        public IFRRepository FriendRequest
+        {
+            get
+            {
+                if (_friend_request == null) _friend_request = new FRRepository(_context);
+                return _friend_request;
             }
         }
 

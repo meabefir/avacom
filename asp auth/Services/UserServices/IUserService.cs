@@ -8,7 +8,7 @@ namespace asp_auth.Services.UserServices
 {
     public interface IUserService
     {
-        Task<bool> RegisterUserAsync(RegisterUserDTO dto);
+        Task<string> RegisterUserAsync(RegisterUserDTO dto);
         Task<String> LoginUser(LoginUserDTO dto);
     }
 }

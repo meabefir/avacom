@@ -25,6 +25,7 @@ namespace asp_auth.Models
         public DbSet<Avatar> Avatars { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<Friend> Friends { get; set; }
+        public DbSet<FriendRequest> FriendRequests { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<PostReaction> PostReactions { get; set; }
         public DbSet<Comment> Comments { get; set; }
@@ -35,11 +36,6 @@ namespace asp_auth.Models
         {
             base.OnModelCreating(builder);
 
-            //foreach (var relationship in builder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
-            //{
-            //    relationship.DeleteBehavior = DeleteBehavior.Restrict;
-            //}
-
             builder.Entity<UserRole>(ur =>
             {
                 ur.HasKey(ur => new { ur.UserId, ur.RoleId });
@@ -48,61 +44,67 @@ namespace asp_auth.Models
             });
 
             // one to one intre user si avatar
-            builder.Entity<User>()
-                .HasOne(u => u.Avatar)
-                .WithOne(a => a.User);
+            builder.Entity<Avatar>().HasKey(a => a.UserId);
+            builder.Entity<Avatar>()
+                .HasOne(a => a.User)
+                .WithOne(u => u.Avatar);
 
             // one to one intre user si user_profile
-            builder.Entity<User>()
-                .HasOne(u => u.UserProfile)
-                .WithOne(up => up.User);
+            builder.Entity<UserProfile>().HasKey(up => up.UserId);
+            builder.Entity<UserProfile>()
+                .HasOne(up => up.User)
+                .WithOne(u => u.UserProfile);
 
             // many to many intre friend si user
-            //builder.Entity<Friend>(f =>
-            //{
-            //    f.HasKey(f => new { f.User1Id, f.User2Id });
-            //    //f.HasOne(f => f.User1).WithMany(u => u.Friends);
-            //    //f.HasOne(f => f.User2).WithMany(u => u.FriendsImWith);
-            //    f.HasOne(f => f.User1).WithMany(u => u.Friends).HasForeignKey(f => f.User1Id).OnDelete(DeleteBehavior.NoAction);
-            //    f.HasOne(f => f.User2).WithMany(u => u.FriendsImWith).HasForeignKey(f => f.User2Id).OnDelete(DeleteBehavior.NoAction);
-            //});
+            builder.Entity<Friend>(f =>
+            {
+                f.HasKey(f => new { f.User1Id, f.User2Id });
+                f.HasOne(f => f.User1).WithMany(u => u.Friends).HasForeignKey(f => f.User1Id).OnDelete(DeleteBehavior.NoAction);
+                f.HasOne(f => f.User2).WithMany(u => u.FriendsImWith).HasForeignKey(f => f.User2Id).OnDelete(DeleteBehavior.NoAction);
+            });
 
-            //builder.Entity<Friend>()
-            //    .HasKey(f => new { f.User1Id, f.User2Id });
-            //builder.Entity<Friend>()
-            //        .HasOne(f => f.User1)
-            //        .WithMany(u => u.Friends);
-            //builder.Entity<Friend>()
-            //        .HasOne(f => f.User2)
-            //        .WithMany(u => u.FriendsImWith);
-
+            // many to many intre friend_request si user
+            builder.Entity<FriendRequest>(f =>
+            {
+                f.HasKey(f => new { f.SenderId, f.ReceiverId });
+                f.HasOne(f => f.Sender).WithMany(u => u.FRReceivedFrom).HasForeignKey(f => f.SenderId).OnDelete(DeleteBehavior.NoAction);
+                f.HasOne(f => f.Receiver).WithMany(u => u.FRSentTo).HasForeignKey(f => f.ReceiverId).OnDelete(DeleteBehavior.NoAction);
+            });
 
             // one to many intre user si postare
-            builder.Entity<User>()
-                .HasMany(u => u.Posts)
-                .WithOne(p => p.User);
+            builder.Entity<Post>()
+                .HasOne(p => p.User)
+                .WithMany(u => u.Posts)
+                .HasForeignKey(p => p.UserId);
 
             // o to m intre post si post_react si o to m intre user si post_react
-            //builder.Entity<PostReaction>(pr =>
-            //{
-            //    pr.HasKey(pr => new { pr.PostId, pr.UserId });
-            //    pr.HasOne(pr => pr.Post).WithMany(p => p.PostReactions);
-            //    pr.HasOne(pr => pr.User).WithMany(u => u.PostReactions);
-            //});
+            builder.Entity<PostReaction>(pr =>
+            {
+                pr.HasKey(pr => new { pr.PostId, pr.UserId });
+                pr.HasOne(pr => pr.Post).WithMany(p => p.PostReactions).HasForeignKey(pr => pr.PostId).OnDelete(DeleteBehavior.NoAction);
+                pr.HasOne(pr => pr.User).WithMany(u => u.PostReactions).HasForeignKey(pr => pr.UserId).OnDelete(DeleteBehavior.NoAction);
+            });
 
-            // one to many intre postare si comm
-            builder.Entity<Post>()
-                .HasMany(p => p.Comments)
-                .WithOne(c => c.Post);
-            //   .HasForeignKey(p => p.PostId);
+            // one to many intre comm si postare
+            builder.Entity<Comment>()
+                .HasOne(c => c.Post)
+                .WithMany(p => p.Comments)
+                .HasForeignKey(c => c.PostId)
+                .OnDelete(DeleteBehavior.NoAction);
+            // one to many intre comm si user
+            builder.Entity<Comment>()
+                .HasOne(c => c.User)
+                .WithMany(p => p.Comments)
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             // o to m intre comm si comm_react si o to m intre user si comm_react
-            //builder.Entity<CommentReaction>(cr =>
-            //{
-            //    cr.HasKey(cr => new { cr.CommentId, cr.UserId });
-            //    cr.HasOne(cr => cr.Comment).WithMany(c => c.CommentReactions);
-            //    cr.HasOne(cr => cr.User).WithMany(u => u.CommentReactions);
-            //});
+            builder.Entity<CommentReaction>(cr =>
+            {
+                cr.HasKey(cr => new { cr.CommentId, cr.UserId });
+                cr.HasOne(cr => cr.Comment).WithMany(c => c.CommentReactions).HasForeignKey(pr => pr.CommentId).OnDelete(DeleteBehavior.NoAction);
+                cr.HasOne(cr => cr.User).WithMany(u => u.CommentReactions).HasForeignKey(pr => pr.UserId).OnDelete(DeleteBehavior.NoAction);
+            });
         }
     }
 }
