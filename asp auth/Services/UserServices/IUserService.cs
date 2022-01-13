@@ -1,4 +1,5 @@
 ﻿using asp_auth.Models.DTOs;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,9 @@ namespace asp_auth.Services.UserServices
     {
         Task<string> RegisterUserAsync(RegisterUserDTO dto);
         Task<String> LoginUser(LoginUserDTO dto);
+
+        string tokenToJWT(string token);
+
+        Task<string> ConfirmEmail(string username, string token);
     }
 }

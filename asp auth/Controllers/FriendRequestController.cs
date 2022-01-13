@@ -22,36 +22,52 @@ namespace asp_auth.Controllers
             _repository = repo;
         }
 
-        [HttpPost("create")]
+        [HttpPost("send/{username}")]
         [Authorize(Roles = "User")]
-        public async Task<IActionResult> SendFriendRequest([FromBody] FriendRequestDTO dto_fr)
+        public async Task<IActionResult> SendFriendRequest(string username)
         {
+            var receiver = await _repository.User.FindByUsernameAsync(username);
+            var sender = await _repository.User.GetByIdAsync(Int32.Parse(User.Identity.Name));
+
             FriendRequest new_fr = new FriendRequest();
-            new_fr.SenderId = dto_fr.SenderId;
-            new_fr.ReceiverId = dto_fr.ReceiverId;
+            new_fr.SenderId = Int32.Parse(User.Identity.Name);
+            new_fr.ReceiverId = receiver.Id;
             new_fr.SentAt = DateTime.Now;
 
-            if (User.Identity.Name != new_fr.SenderId.ToString())
-                return BadRequest("attempted to send a FR with different sender id");
-
             // User sender_user = _repository.User.fin
-            Console.WriteLine("user " + User.Identity.Name + " sent a friend request to user " + dto_fr.ReceiverId);
+            Console.WriteLine("user " + sender.UserName + " sent a friend request to user " + receiver.UserName);
 
             _repository.FriendRequest.Create(new_fr);
 
             await _repository.SaveAsync();
 
-            return Ok(new_fr);
+            return Ok();
         }
 
-        [HttpGet("{receiverId}")]
+        [HttpDelete("delete/{username}")]
         [Authorize(Roles = "User")]
-        public async Task<IActionResult> GetFriendRequestsByReceiverId(int receiverId)
+        public async Task<IActionResult> DeleteFriendRequest(string username)
         {
-            if (User.Identity.Name != receiverId.ToString())
-                return BadRequest("attempted to fetch friends requests of another user");
+            var sender = await _repository.User.FindByUsernameAsync(username);
+            var receiver = await _repository.User.GetByIdAsync(Int32.Parse(User.Identity.Name));
 
-            var posts = await _repository.FriendRequest.GetFriendRequestsByReceiverId(receiverId);
+            var fr = await _repository.FriendRequest.GetByIdAsync(sender.Id, receiver.Id);
+
+            _repository.FriendRequest.Delete(fr);
+
+            await _repository.SaveAsync();
+
+            return Ok();
+        }
+
+        [HttpGet("received")]
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> GetFriendRequestsByReceiverId()
+        {
+
+            var user = await _repository.User.GetByIdAsync(Int32.Parse(User.Identity.Name));
+
+            var posts = await _repository.FriendRequest.GetFriendRequestsByReceiverUsername(user.UserName);
 
             return Ok(posts);
         }

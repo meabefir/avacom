@@ -27,7 +27,7 @@ namespace asp_auth.Controllers
         public async Task<IActionResult> CreatePost([FromBody] CreatePostDTO dto_post)
         {
             Post new_post = new Post();
-            new_post.UserId = dto_post.UserId;
+            new_post.UserId = Int32.Parse(User.Identity.Name);
             new_post.Title = dto_post.Title;
             new_post.Text = dto_post.Text;
             new_post.CreatedAt = DateTime.Now;
@@ -44,6 +44,7 @@ namespace asp_auth.Controllers
 
             return Ok(new_post);
         }
+
 
         [HttpGet("{userId}")]
         [Authorize(Roles = "User")]

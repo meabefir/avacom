@@ -1,5 +1,6 @@
 ﻿using asp_auth.Models;
 using asp_auth.Models.Entities;
+using asp_auth.Models.Views;
 using lab2.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -16,14 +17,37 @@ namespace asp_auth.Repositories
 
         }
 
-        public async Task<List<FriendRequest>> GetFriendRequestsBySenderId(int senderId)
+        public async Task<List<FriendRequestView>> GetFriendRequestsBySenderUsername(string username)
         {
-            return await _context.FriendRequests.Where(fr => fr.SenderId.Equals(senderId)).ToListAsync();
+            return await _context.FriendRequests
+                .Where(fr => fr.Sender.UserName.Equals(username))
+                .Select(fr => new FriendRequestView
+                {
+                    Sender = fr.Sender.UserName,
+                    Receiver = fr.Receiver.UserName,
+                    SentAt = fr.SentAt
+                })
+                .ToListAsync();
         }
 
-        public async Task<List<FriendRequest>> GetFriendRequestsByReceiverId(int receiverId)
+        public async Task<List<FriendRequestView>> GetFriendRequestsByReceiverUsername(string username)
         {
-            return await _context.FriendRequests.Where(fr => fr.ReceiverId.Equals(receiverId)).ToListAsync();
+            return await _context.FriendRequests
+                .Where(fr => fr.Receiver.UserName.Equals(username))
+                .Select(fr => new FriendRequestView
+                {
+                    Sender = fr.Sender.UserName,
+                    Receiver = fr.Receiver.UserName,
+                    SentAt = fr.SentAt
+                })
+                .ToListAsync();
+        }
+
+        public async Task<FriendRequest> GetByIdAsync(int senderId, int receiverId)
+        {
+            return await _context.FriendRequests
+                .Where(fr => (fr.SenderId.Equals(senderId) && fr.ReceiverId.Equals(receiverId)))
+                .FirstOrDefaultAsync();
         }
     }
 }

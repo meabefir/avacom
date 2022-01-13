@@ -15,6 +15,12 @@ namespace asp_auth.Repositories
         {
 
         }
+
+        public async Task<User> FindByUsernameAsync(string username)
+        {
+            return await _context.Users.Where(u => u.UserName.Equals(username)).FirstOrDefaultAsync();
+        }
+
         public async Task<List<User>> GetAllUsers()
         {
             return await _context.Users.ToListAsync();
@@ -31,6 +37,11 @@ namespace asp_auth.Repositories
         public async Task<User> GetUserByEmail(string email)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Email.Equals(email));
+        }
+
+        public void test()
+        {
+            Console.WriteLine("originala");
         }
     }
 }

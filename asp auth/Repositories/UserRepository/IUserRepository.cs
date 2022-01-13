@@ -10,7 +10,9 @@ namespace asp_auth.Repositories
     public interface IUserRepository: IGenericRepository<User>
     {
         Task<List<User>> GetAllUsers();
+        Task<User> FindByUsernameAsync(string username);
         Task<User> GetUserByEmail(string email);
         Task<User> GetByIdWithRoles(int id);
+        void test();
     }
 }
