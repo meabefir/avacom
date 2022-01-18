@@ -1,4 +1,5 @@
 ﻿using asp_auth.Models;
+using asp_auth.Models.DTOs;
 using asp_auth.Models.Entities;
 using asp_auth.Models.Views;
 using lab2.Repositories;
@@ -8,7 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
+using PostView = asp_auth.Models.Views.PostView;
 
 public class DateComparer : IComparer<DateTime>
 {
@@ -17,6 +18,13 @@ public class DateComparer : IComparer<DateTime>
     {
         return 1;
     }
+}
+
+class Test
+{
+    public Post post { get; set; }
+    public Friend friend { get; set; }
+    public string Username { get; set; }
 }
 
 namespace asp_auth.Repositories
@@ -50,26 +58,74 @@ namespace asp_auth.Repositories
 
             }
 
-            var log = await _context.Friends
+            var log = _context.Friends
+                .ToList()
                 .Where(f => f.User1Id == userId || f.User2Id == userId)
                 .Join(
-                    _context.Posts,
+                    _context.Posts.Include(p => p.User),
                     f => f.User1Id == userId ? f.User2Id : f.User1Id,
                     post => post.UserId,
-                    (f, post) => new PostView
+                    (f, post) => new Test
                     {
-                        Id = post.Id,
-                        Title = post.Title,
-                        Text = post.Text,
-                        Username = f.User1Id == userId ? f.User2.UserName : f.User1.UserName,
-                        CreatedAt = post.CreatedAt
+                        post = post,
+                        friend = f,
                     }
                 )
-                //.OrderBy(pw => pw.CreatedAt, new DateComparer()) doesnt work for some fucked up reason ahah
-                .OrderBy(pw => pw.CreatedAt)
-                .ToListAsync();
-            _context.Friends.Remove(temp_f);
-            _context.SaveChanges();
+                .GroupJoin(
+                    _context.Comments.Include(c => c.User),
+                    pf => pf.post,
+                    comms => comms.Post,
+                    (pf, comms) => new PostView
+                    {
+                        Id = pf.post.Id,
+                        Title = pf.post.Title,
+                        Text = pf.post.Text,
+                        Username = pf.post.User.UserName,
+                        CreatedAt = pf.post.CreatedAt,
+                        Comments = comms.Select(c => new CommentView
+                        {
+                            Username = c.User.UserName,
+                            Text = c.Text,
+                            CreatedAt = c.CreatedAt
+                        }).ToList()
+                    }
+                )
+            //.OrderBy(pw => pw.CreatedAt, new DateComparer()) doesnt work for some fucked up reason ahah
+            .OrderBy(pw => pw.CreatedAt)
+            .ToList();
+            // .ToListAsync();
+
+            //var log = _context.Posts.ToList()
+            //    .GroupJoin(
+            //        _context.Comments,
+            //        pf => pf,
+            //        comms => comms.Post,
+            //        (pf, comms) => new
+            //        {
+            //            Id = pf.Id,
+            //            Title = pf.Title,
+            //            Text = pf.Text,
+            //            CreatedAt = pf.CreatedAt,
+            //            Comments = comms.Select(c => new
+            //            {
+            //                Username = c.User.UserName,
+            //                Text = c.Text,
+            //                CreatedAt = c.CreatedAt
+            //            }).ToList()
+            //        }
+            //    );
+            //foreach (var obj in log)
+            //{
+            //    Console.WriteLine("{0}: {1}", obj.Id, obj.Comments.Count());
+            //}
+            try
+            {
+                _context.Friends.Remove(temp_f);
+                _context.SaveChanges();
+            }
+            catch (Exception e)
+            { }
+
             return log;
         }
 

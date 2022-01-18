@@ -5,11 +5,10 @@ using System.Threading.Tasks;
 
 namespace asp_auth.Models.DTOs
 {
-    public class UserProfileView
+    public class CommentView
     {
         public string Username { get; set; }
-        public string Bio { get; set; }
-        public string Nickname { get; set; }
-        public int Age { get; set; }
+        public string Text { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }

@@ -26,10 +26,15 @@ namespace asp_auth.Controllers
         [Authorize(Roles = "User")]
         public async Task<IActionResult> CreatePostReaction([FromBody] CreatePostReactionDTO dto_post_reaction)
         {
+            var sender = await _repository.User.GetByIdAsync(Int32.Parse(User.Identity.Name));
+            var post = await _repository.Post.GetByIdAsync(dto_post_reaction.PostId);
+
             PostReaction new_post_reaction = new PostReaction();
             new_post_reaction.UserId = dto_post_reaction.UserId;
             new_post_reaction.PostId = dto_post_reaction.PostId;
             new_post_reaction.ReactionType = dto_post_reaction.ReactionType;
+            new_post_reaction.User = sender;
+            new_post_reaction.Post = post;
 
             if (User.Identity.Name != new_post_reaction.UserId.ToString())
                 return BadRequest("attempted to create post reaction with different used id");

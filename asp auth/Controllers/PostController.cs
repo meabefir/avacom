@@ -26,11 +26,14 @@ namespace asp_auth.Controllers
         [Authorize(Roles = "User")]
         public async Task<IActionResult> CreatePost([FromBody] CreatePostDTO dto_post)
         {
+            var sender = await _repository.User.GetByIdAsync(Int32.Parse(User.Identity.Name));
+
             Post new_post = new Post();
             new_post.UserId = Int32.Parse(User.Identity.Name);
             new_post.Title = dto_post.Title;
             new_post.Text = dto_post.Text;
             new_post.CreatedAt = DateTime.Now;
+            new_post.User = sender;
 
             // User sender_user = _repository.User.fin
             Console.WriteLine("user " + User.Identity.Name + " made a post");
@@ -50,6 +53,36 @@ namespace asp_auth.Controllers
             return Ok(pw);
         }
 
+        [HttpPost("comment")]
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> Comment([FromBody] CommentDTO comm_dto)
+        {
+            var sender = await _repository.User.GetByIdAsync(Int32.Parse(User.Identity.Name));
+            var post = await _repository.Post.GetByIdAsync(comm_dto.PostId);
+
+            Comment new_comm = new Comment();
+            new_comm.UserId = Int32.Parse(User.Identity.Name);
+            new_comm.PostId = comm_dto.PostId;
+            new_comm.Text = comm_dto.Text;
+            new_comm.CreatedAt = DateTime.Now;
+            new_comm.User = sender;
+            new_comm.Post = post;
+
+            // User sender_user = _repository.User.fin
+            Console.WriteLine("user " + User.Identity.Name + "commented on post with id " + new_comm.PostId);
+
+            _repository.Comment.Create(new_comm);
+
+            await _repository.SaveAsync();
+
+            var posting_user = await _repository.User.GetByIdAsync(Int32.Parse(User.Identity.Name));
+
+            CommentView pw = new CommentView();
+            pw.Username = posting_user.UserName;
+            pw.Text = comm_dto.Text;
+
+            return Ok(pw);
+        }
 
         [HttpGet("{userId}")]
         [Authorize(Roles = "User")]

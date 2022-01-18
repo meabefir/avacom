@@ -16,6 +16,7 @@ namespace asp_auth.Repositories
         private IFriendRepository _friend;
         private IUserProfileRepo _user_profile;
         private IPostReactionRepository _post_reaction;
+        private ICommentRepo _comment;
         private ISessionTokenRepository _sessionToken;
 
         public RepositoryWrapper(AppDbContext context)
@@ -74,6 +75,14 @@ namespace asp_auth.Repositories
             {
                 if (_user_profile == null) _user_profile = new UserProfileRepo(_context);
                 return _user_profile;
+            }
+        }
+        public ICommentRepo Comment
+        {
+            get
+            {
+                if (_comment == null) _comment = new CommentRepo(_context);
+                return _comment;
             }
         }
 

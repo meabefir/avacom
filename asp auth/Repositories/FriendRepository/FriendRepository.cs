@@ -27,7 +27,7 @@ namespace asp_auth.Repositories
 
         public async Task<List<FriendView>> GetFriends(int userId)
         {
-            return await _context.Friends.Where(f => f.User1Id == userId || f.User2Id == userId).Select(f => 
+            return await _context.Friends.Where(f => (f.User1Id == userId || f.User2Id == userId) && f.User1Id != f.User2Id).Select(f => 
                 new FriendView
                 {
                     Username = f.User1Id == userId ? f.User2.UserName : f.User1.UserName,

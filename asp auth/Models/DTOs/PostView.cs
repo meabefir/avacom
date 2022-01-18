@@ -7,6 +7,7 @@ namespace asp_auth.Models.DTOs
 {
     public class PostView
     {
+        public int Id { get; set; }
         public string Title { get; set; }
         public string Text { get; set; }
         public string Username { get; set; }

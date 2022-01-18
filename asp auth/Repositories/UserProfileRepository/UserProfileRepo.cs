@@ -20,6 +20,7 @@ namespace asp_auth.Repositories
         async public Task<UserProfileView> GetByPk(int userId)
         {
             var up = await _context.UserProfiles.Where(up => up.UserId.Equals(userId)).FirstOrDefaultAsync();
+            var sender = await _context.Users.Where(u => u.Id == userId).FirstOrDefaultAsync();
 
             if (up == null)
             {
@@ -28,11 +29,14 @@ namespace asp_auth.Repositories
                 new_profile.UserId = userId;
                 new_profile.Bio = "";
                 new_profile.Nickname = "";
+                new_profile.User = sender;
+
                 Create(new_profile);
                 await SaveAsync();
 
                 return new UserProfileView
                 {
+                    Username = sender.UserName,
                     Bio = new_profile.Bio,
                     Nickname = new_profile.Nickname,
                     Age = new_profile.Age
@@ -41,6 +45,7 @@ namespace asp_auth.Repositories
 
             return new UserProfileView
             {
+                Username = sender.UserName,
                 Bio = up.Bio,
                 Nickname = up.Nickname,
                 Age = up.Age

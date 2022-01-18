@@ -43,6 +43,8 @@ namespace asp_auth.Controllers
                 return Ok(new { message = "Can't send friend request to yourself."});
 
             FriendRequest new_fr = new FriendRequest();
+            new_fr.Sender = sender;
+            new_fr.Receiver = receiver;
             new_fr.SenderId = Int32.Parse(User.Identity.Name);
             new_fr.ReceiverId = receiver.Id;
             new_fr.SentAt = DateTime.Now;
@@ -113,6 +115,8 @@ namespace asp_auth.Controllers
             }
 
             Friend new_f = new Friend();
+            new_f.User1 = sender;
+            new_f.User2 = receiver;
             new_f.User1Id = sender.Id;
             new_f.User2Id = receiver.Id;
             new_f.FriendsSince = DateTime.Now;
