@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace asp_auth.Services.UserServices
+namespace asp_auth.Services
 {
     public interface IUserService
     {

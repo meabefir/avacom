@@ -23,8 +23,7 @@ namespace asp_auth.Repositories
                 .Where(fr => fr.Sender.UserName.Equals(username))
                 .Select(fr => new FriendRequestView
                 {
-                    Sender = fr.Sender.UserName,
-                    Receiver = fr.Receiver.UserName,
+                    Username = fr.Receiver.UserName,
                     SentAt = fr.SentAt
                 })
                 .ToListAsync();
@@ -36,17 +35,18 @@ namespace asp_auth.Repositories
                 .Where(fr => fr.Receiver.UserName.Equals(username))
                 .Select(fr => new FriendRequestView
                 {
-                    Sender = fr.Sender.UserName,
-                    Receiver = fr.Receiver.UserName,
+                    Username = fr.Sender.UserName,
                     SentAt = fr.SentAt
                 })
+                .OrderBy(fr => fr.SentAt)
                 .ToListAsync();
         }
 
         public async Task<FriendRequest> GetByIdAsync(int senderId, int receiverId)
         {
             return await _context.FriendRequests
-                .Where(fr => (fr.SenderId.Equals(senderId) && fr.ReceiverId.Equals(receiverId)))
+                .Where(fr => ((fr.SenderId.Equals(senderId) && fr.ReceiverId.Equals(receiverId)) ||
+                                (fr.SenderId.Equals(receiverId) && fr.ReceiverId.Equals(senderId))) )
                 .FirstOrDefaultAsync();
         }
     }

@@ -13,6 +13,8 @@ namespace asp_auth.Repositories
         private IUserRepository _user;
         private IPostRepository _post;
         private IFRRepository _friend_request;
+        private IFriendRepository _friend;
+        private IUserProfileRepo _user_profile;
         private IPostReactionRepository _post_reaction;
         private ISessionTokenRepository _sessionToken;
 
@@ -54,6 +56,24 @@ namespace asp_auth.Repositories
             {
                 if (_friend_request == null) _friend_request = new FRRepository(_context);
                 return _friend_request;
+            }
+        }
+
+        public IFriendRepository Friend
+        {
+            get
+            {
+                if (_friend == null) _friend = new FriendRepository(_context);
+                return _friend;
+            }
+        }
+
+        public IUserProfileRepo UserProfile
+        {
+            get
+            {
+                if (_user_profile == null) _user_profile = new UserProfileRepo(_context);
+                return _user_profile;
             }
         }
 

@@ -11,5 +11,6 @@ namespace asp_auth.Repositories
     public interface IPostRepository : IGenericRepository<Post>
     {
         Task<List<PostView>> GetPostsByUserId(int UserId);
+        Task<List<PostView>> GetFeed(int UserId);
     }
 }

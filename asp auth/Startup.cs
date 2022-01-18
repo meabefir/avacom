@@ -3,7 +3,7 @@ using asp_auth.Models.Constants;
 using asp_auth.Models.Entities;
 using asp_auth.Repositories;
 using asp_auth.Seed;
-using asp_auth.Services.UserServices;
+using asp_auth.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -96,6 +96,8 @@ namespace asp_auth
                 });
 
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IFRService, FRService>();
+
             services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
             services.AddScoped<SeedDb>();
 

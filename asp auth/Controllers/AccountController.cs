@@ -2,7 +2,7 @@
 using asp_auth.Models.DTOs;
 using asp_auth.Models.Entities;
 using asp_auth.Repositories;
-using asp_auth.Services.UserServices;
+using asp_auth.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;

@@ -32,9 +32,6 @@ namespace asp_auth.Controllers
             new_post.Text = dto_post.Text;
             new_post.CreatedAt = DateTime.Now;
 
-            if (User.Identity.Name != new_post.UserId.ToString())
-                return BadRequest("attempted to create post with different used id");
-
             // User sender_user = _repository.User.fin
             Console.WriteLine("user " + User.Identity.Name + " made a post");
 
@@ -42,7 +39,15 @@ namespace asp_auth.Controllers
 
             await _repository.SaveAsync();
 
-            return Ok(new_post);
+            var posting_user = await _repository.User.GetByIdAsync(Int32.Parse(User.Identity.Name));
+
+            PostView pw = new PostView();
+            pw.Username = posting_user.UserName;
+            pw.Text = new_post.Text;
+            pw.Title = new_post.Title;
+            pw.CreatedAt = new_post.CreatedAt;
+
+            return Ok(pw);
         }
 
 
@@ -51,6 +56,15 @@ namespace asp_auth.Controllers
         public async Task<IActionResult> GetPostsByUserId(int userId)
         {
             var posts = await _repository.Post.GetPostsByUserId(userId);
+
+            return Ok(posts);
+        }
+
+        [HttpGet("feed")]
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> GetFeed()
+        {
+            var posts = await _repository.Post.GetFeed(Int32.Parse(User.Identity.Name));
 
             return Ok(posts);
         }

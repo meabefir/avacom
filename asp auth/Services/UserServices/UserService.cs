@@ -15,7 +15,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace asp_auth.Services.UserServices
+namespace asp_auth.Services
 {
     public class UserService : IUserService
     {
@@ -57,7 +57,7 @@ namespace asp_auth.Services.UserServices
             if (result.Succeeded)
             {
                 await _userManager.AddToRoleAsync(registerUser, UserRoleType.User);
-
+                
                 return "true";
             }
             else if (result.Errors.Count() > 0)
