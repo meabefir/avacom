@@ -10,8 +10,8 @@ using asp_auth.Models;
 namespace asp_auth.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220118131426_m1")]
-    partial class m1
+    [Migration("20220125134140_mmm")]
+    partial class mmm
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

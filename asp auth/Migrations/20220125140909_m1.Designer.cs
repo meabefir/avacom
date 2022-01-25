@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using asp_auth.Models;
 
 namespace asp_auth.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220125140909_m1")]
+    partial class m1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -111,12 +113,6 @@ namespace asp_auth.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("AccessoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BodyId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BrowsId")
                         .HasColumnType("int");
 
                     b.Property<int>("ClothingId")

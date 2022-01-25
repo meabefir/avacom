@@ -21,7 +21,7 @@ namespace asp_auth.Controllers
         }
 
         [HttpGet("getAll")]
-        // [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         // [AllowAnonymous]
         public async Task<IActionResult> GetAllUsers()
         {

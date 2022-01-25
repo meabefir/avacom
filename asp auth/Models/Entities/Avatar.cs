@@ -20,6 +20,8 @@ namespace asp_auth.Models.Entities
         public int LipsId { get; set; }
         public int AccessoryId{ get; set; }
         public int ClothingId{ get; set; }
+        public int BodyId { get; set; }
+        public int BrowsId { get; set; }
 
         [ForeignKey("UserId")]
         public User User { get; set; }
