@@ -16,6 +16,13 @@ namespace asp_auth.Repositories
 
         }
 
+        async public Task<string> DeleteFrom(int userId, int postId)
+        {
+            var to_delete = await _context.PostReactions.Where(pr => (pr.UserId == userId && pr.PostId == postId)).ToListAsync();
+            _context.PostReactions.RemoveRange(to_delete);
+            return "ok";
+        }
+
         public async Task<List<PostReaction>> GetPostReactionsByPostId(int postId)
         {
             return await _context.PostReactions.Where(pr => pr.PostId.Equals(postId)).ToListAsync();

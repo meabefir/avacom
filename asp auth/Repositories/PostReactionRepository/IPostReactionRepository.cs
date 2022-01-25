@@ -10,5 +10,7 @@ namespace asp_auth.Repositories
     public interface IPostReactionRepository : IGenericRepository<PostReaction>
     {
         Task<List<PostReaction>> GetPostReactionsByPostId(int UserId);
+
+        Task<string> DeleteFrom(int userId, int postId);
     }
 }

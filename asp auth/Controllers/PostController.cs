@@ -93,6 +93,22 @@ namespace asp_auth.Controllers
             return Ok(posts);
         }
 
+        [HttpDelete("{postId}")]
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> DeletePost(int postId)
+        {
+            var post = await _repository.Post.GetByIdAsync(postId);
+            if (post.UserId != Int32.Parse(User.Identity.Name))
+            {
+                return BadRequest(new { message = "you are not the post owner!" });
+            }
+            _repository.Post.Delete(post);
+
+            await _repository.SaveAsync();
+
+            return Ok(new { message = "Post deleted" });
+        }
+
         [HttpGet("feed")]
         [Authorize(Roles = "User")]
         public async Task<IActionResult> GetFeed()

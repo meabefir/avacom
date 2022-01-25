@@ -62,7 +62,7 @@ namespace asp_auth.Repositories
                 .ToList()
                 .Where(f => f.User1Id == userId || f.User2Id == userId)
                 .Join(
-                    _context.Posts.Include(p => p.User),
+                    _context.Posts.Include(p => p.User).ThenInclude(u => u.Avatar),
                     f => f.User1Id == userId ? f.User2Id : f.User1Id,
                     post => post.UserId,
                     (f, post) => new Test
@@ -77,10 +77,35 @@ namespace asp_auth.Repositories
                     comms => comms.Post,
                     (pf, comms) => new PostView
                     {
+                        IsMyPost = pf.post.UserId == userId,
+                        Reactions = _context.PostReactions.Where(pr => pr.PostId.Equals(pf.post.Id))
+                                                        .AsEnumerable().GroupBy(pr => pr.ReactionType).Select(gr => new ReactionGroupBy
+                                                        {
+                                                            Type = gr.Key,
+                                                            Count = gr.Count()
+                                                        }).ToList(),
+                        LikedByMe = _context.PostReactions.Where(pr => pr.PostId.Equals(pf.post.Id))
+                                                            .Where(pr => pr.UserId.Equals(userId))
+                                                            .Where(pr => pr.ReactionType.Equals("like"))
+                                                            .ToList().Count > 0,
+                        DislikedByMe = _context.PostReactions.Where(pr => pr.PostId.Equals(pf.post.Id))
+                                                            .Where(pr => pr.UserId.Equals(userId))
+                                                            .Where(pr => pr.ReactionType.Equals("dislike"))
+                                                            .ToList().Count > 0,
                         Id = pf.post.Id,
                         Title = pf.post.Title,
                         Text = pf.post.Text,
                         Username = pf.post.User.UserName,
+                        Avatar = new AvatarView
+                        {
+                            EyesId = pf.post.User.Avatar.EyesId,
+                            BodyId = pf.post.User.Avatar.BodyId,
+                            ClothingId = pf.post.User.Avatar.ClothingId,
+                            NoseId = pf.post.User.Avatar.NoseId,
+                            BrowsId = pf.post.User.Avatar.BrowsId,
+                            LipsId = pf.post.User.Avatar.LipsId,
+                            HairId = pf.post.User.Avatar.HairId,
+                        },
                         CreatedAt = pf.post.CreatedAt,
                         Comments = comms.Select(c => new CommentView
                         {
@@ -118,6 +143,7 @@ namespace asp_auth.Repositories
             //{
             //    Console.WriteLine("{0}: {1}", obj.Id, obj.Comments.Count());
             //}
+
             try
             {
                 _context.Friends.Remove(temp_f);
