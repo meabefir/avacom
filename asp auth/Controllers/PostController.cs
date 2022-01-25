@@ -98,10 +98,15 @@ namespace asp_auth.Controllers
         public async Task<IActionResult> DeletePost(int postId)
         {
             var post = await _repository.Post.GetByIdAsync(postId);
-            if (post.UserId != Int32.Parse(User.Identity.Name))
-            {
-                return BadRequest(new { message = "you are not the post owner!" });
-            }
+
+            var comments = _repository.Comment.GetAll().ToList();
+            _repository.Comment.DeleteRange(comments);
+
+            var reactions = _repository.PostReaction.GetAll().ToList();
+            _repository.PostReaction.DeleteRange(reactions);
+
+            await _repository.SaveAsync();
+
             _repository.Post.Delete(post);
 
             await _repository.SaveAsync();

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace asp_auth.Migrations
 {
-    public partial class mmm : Migration
+    public partial class test1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -168,7 +168,9 @@ namespace asp_auth.Migrations
                     FaceId = table.Column<int>(type: "int", nullable: false),
                     LipsId = table.Column<int>(type: "int", nullable: false),
                     AccessoryId = table.Column<int>(type: "int", nullable: false),
-                    ClothingId = table.Column<int>(type: "int", nullable: false)
+                    ClothingId = table.Column<int>(type: "int", nullable: false),
+                    BodyId = table.Column<int>(type: "int", nullable: false),
+                    BrowsId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {

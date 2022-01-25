@@ -1,4 +1,5 @@
 ﻿using asp_auth.Models;
+using asp_auth.Models.Constants;
 using asp_auth.Models.DTOs;
 using asp_auth.Models.Entities;
 using asp_auth.Models.Views;
@@ -38,8 +39,65 @@ namespace asp_auth.Repositories
 
         public async Task<List<PostView>> GetFeed(int userId)
         {
-            var sender_user = await _context.Users.Where(u => u.Id == userId).FirstAsync();
+            var sender_user = await _context.Users.Include(u => u.UserRoles).ThenInclude(u => u.Role).Where(u => u.Id == userId).FirstAsync();
 
+
+            var roles = sender_user.UserRoles.Select(ur => ur.Role.Name).ToList();
+            var is_admin = roles.Contains("Admin");
+
+            if (is_admin)
+            {
+                Console.WriteLine("IM ADMIN IM ADMIN IM ADMIN IM ADMIN IM ADMIN");
+                return _context.Posts.Include(p => p.User).ThenInclude(u => u.Avatar)
+                .ToList()
+                .GroupJoin(
+                    _context.Comments.Include(c => c.User),
+                    p => p,
+                    comms => comms.Post,
+                    (p, comms) => new PostView
+                    {
+                        IsMyPost = true,
+                        Reactions = _context.PostReactions.Where(pr => pr.PostId.Equals(p.Id))
+                                                        .AsEnumerable().GroupBy(pr => pr.ReactionType).Select(gr => new ReactionGroupBy
+                                                        {
+                                                            Type = gr.Key,
+                                                            Count = gr.Count()
+                                                        }).ToList(),
+                        LikedByMe = _context.PostReactions.Where(pr => pr.PostId.Equals(p.Id))
+                                                            .Where(pr => pr.UserId.Equals(userId))
+                                                            .Where(pr => pr.ReactionType.Equals("like"))
+                                                            .ToList().Count > 0,
+                        DislikedByMe = _context.PostReactions.Where(pr => pr.PostId.Equals(p.Id))
+                                                            .Where(pr => pr.UserId.Equals(userId))
+                                                            .Where(pr => pr.ReactionType.Equals("dislike"))
+                                                            .ToList().Count > 0,
+                        Id = p.Id,
+                        Title = p.Title,
+                        Text = p.Text,
+                        Username = p.User.UserName,
+                        Avatar = new AvatarView
+                        {
+                            EyesId = p.User.Avatar.EyesId,
+                            BodyId = p.User.Avatar.BodyId,
+                            ClothingId = p.User.Avatar.ClothingId,
+                            NoseId = p.User.Avatar.NoseId,
+                            BrowsId = p.User.Avatar.BrowsId,
+                            LipsId = p.User.Avatar.LipsId,
+                            HairId = p.User.Avatar.HairId,
+                        },
+                        CreatedAt = p.CreatedAt,
+                        Comments = comms.Select(c => new CommentView
+                        {
+                            Username = c.User.UserName,
+                            Text = c.Text,
+                            CreatedAt = c.CreatedAt
+                        }).ToList()
+                    }
+                )
+                .OrderBy(pw => pw.CreatedAt)
+                .ToList();
+            }
+            // else if not god user admin
             // tmp add friend relationship between me and me
             var temp_f = new Friend
             {

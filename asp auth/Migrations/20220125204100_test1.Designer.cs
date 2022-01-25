@@ -10,8 +10,8 @@ using asp_auth.Models;
 namespace asp_auth.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220125134140_mmm")]
-    partial class mmm
+    [Migration("20220125204100_test1")]
+    partial class test1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -113,6 +113,12 @@ namespace asp_auth.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("AccessoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BodyId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BrowsId")
                         .HasColumnType("int");
 
                     b.Property<int>("ClothingId")
