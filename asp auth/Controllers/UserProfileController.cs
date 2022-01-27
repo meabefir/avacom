@@ -1,6 +1,7 @@
 ﻿using asp_auth.Models.DTOs;
 using asp_auth.Models.Views;
 using asp_auth.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -22,7 +23,7 @@ namespace asp_auth.Controllers
         }
 
         [HttpGet("myProfile")]
-        // [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> GetMyProfile()
         {
             var up_view = await _repository.UserProfile.GetByPk(Int32.Parse(User.Identity.Name));
@@ -31,7 +32,7 @@ namespace asp_auth.Controllers
         }
 
         [HttpPut("myAvatar")]
-        // [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> UpdateMyAvatar([FromBody] AvatarView av_dto)
         {
             var new_avatar = await _repository.Avatar.UpdateAvatar(av_dto, Int32.Parse(User.Identity.Name));
@@ -39,7 +40,7 @@ namespace asp_auth.Controllers
         }
 
         [HttpPut("myProfile")]
-        // [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> UpdateMyProfile([FromBody] UserProfileDTO up_dto)
         {
             var up = await _repository.UserProfile.GetByPkRaw(Int32.Parse(User.Identity.Name));
@@ -59,7 +60,7 @@ namespace asp_auth.Controllers
         }
 
         [HttpGet("profile/{username}")]
-        // [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> GetUserProfile(string username)
         {
             var up_view = await _repository.UserProfile.GetUserProfile(username);
